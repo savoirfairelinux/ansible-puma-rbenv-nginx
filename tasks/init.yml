@@ -1,0 +1,22 @@
+---
+- name: Ensure home root directory
+  file:
+    path: "{{ app_puma_home_root }}"
+    state: directory
+
+- name: Ensure packages dependencies
+  apt:
+    name: "{{ item }}"
+  with_items: "{{ app_puma_apt_dependencies }}"
+
+- name: Ensure app user
+  user:
+    name: "{{ app_puma_exec_user }}"
+    home: "{{ app_puma_home_path }}"
+
+- name: Ensure app user directory permissions
+  file:
+    path: "{{ app_puma_home_path }}"
+    owner: "{{ app_puma_exec_user }}"
+    group: "{{ app_puma_exec_group }}"
+    mode: "u=rwx,g=rx,o="

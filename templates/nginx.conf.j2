@@ -1,0 +1,67 @@
+{% if app_nginx_limitreq_enabled %}
+limit_req_zone  $binary_remote_addr  zone={{ app_name }}:10m  rate=1r/s;
+{% endif %}
+
+{% if app_nginx_ssl_enabled and app_nginx_ssl_only -%}
+server {
+    server_name {{ app_name }};
+    listen 80; listen [::]:80;
+    return 301 https://$server_name$request_uri;
+}
+{% endif -%}
+
+server {
+    server_name {{ app_name }};
+
+    {% if not app_nginx_ssl_only %}
+    listen 80; listen [::]:80;
+    {% endif %}
+
+    {% if app_nginx_ssl_enabled -%}
+    listen 443 ssl {% if app_nginx_ssl_spdy_enabled %}http2{% endif %};
+    listen [::]:443 ssl {% if app_nginx_ssl_spdy_enabled %}http2{% endif %};
+
+    ssl_certificate {{ app_nginx_ssl_cert_path }};
+    ssl_certificate_key {{ app_nginx_ssl_priv_path }};
+    {% endif %}
+
+    {% for path in app_nginx_static_paths %}
+    location {{ path }} {
+        alias {{ (app_nginx_static_root ~ path)|replace('//', '/') }};
+        access_log off;
+        {% if app_nginx_static_cache_assets_enabled %}
+        expires {{ app_nginx_static_cache_assets_expire_hours }}h;
+        {% endif %}
+    }
+    {% endfor %}
+    location = /robots.txt {
+        log_not_found off;
+        access_log off;
+    }
+
+    {% if app_nginx_gzip_enabled %}
+    gzip on;
+    gzip_disable "MSIE [1-6]\.(?!.*SV1)";
+    gzip_vary on;
+    gzip_types text/css application/javascript image/png image/svg+xml;
+    gzip_proxied any;
+    gzip_comp_level {{ app_nginx_gzip_compression_level }};
+    gzip_buffers 16 8k;
+    gzip_http_version 1.0;
+    {% endif %}
+
+    error_log /var/log/nginx/{{ app_name }}_error.log;
+    access_log /var/log/nginx/{{ app_name }}_access.log;
+
+    location / {
+        {% if app_nginx_limitreq_enabled %}
+        limit_req zone={{ app_name }} burst={{ app_nginx_limitreq_per_second }} nodelay;
+        limit_req_log_level error;
+        limit_req_status 429;
+        {% endif %}
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_pass http://unix:{{ app_socket_path }};
+        {{ app_nginx_extra_conf|default }}
+    }
+}

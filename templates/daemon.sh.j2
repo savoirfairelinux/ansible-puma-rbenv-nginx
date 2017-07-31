@@ -1,0 +1,9 @@
+#!/bin/bash
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $DIR &&
+. {{ app_rbenv_activation_script_path }} &&
+cd src &&
+exec {% if app_puma_envvar_key %}env {{ app_puma_envvar_key }}={{ app_puma_envvar_value }}{% endif %} puma \
+          --bind unix://{{ app_socket_path }} \
+          --workers {{ app_puma_n_worker }} \
+          --threads {{ app_puma_n_thread }}

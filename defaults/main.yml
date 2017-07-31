@@ -1,0 +1,99 @@
+## global variables ###########################################################
+
+# the name of app (ex: vhostname, log file name, socket name, etc ..)
+app_name: example.org
+app_puma_service_name: "{{ app_name }}"
+
+# optional env vars for daemon environment (ex: RAILS_ENV=production)
+app_puma_envvar_key: ""
+app_puma_envvar_value: ""
+
+# environment relative variables
+app_puma_ruby_version: 2.2.3
+app_puma_home_root: "/opt"
+app_puma_home_file: "{{ app_puma_service_name }}"
+app_puma_home_path: "{{ app_puma_home_root }}/{{ app_puma_home_file }}"
+app_puma_log_file: "{{ app_puma_service_name }}.log"
+app_puma_log_path: "{{ app_puma_home_path }}/{{ app_puma_log_file }}"
+app_socket_root: "{{ app_puma_home_path }}"
+app_socket_file: "{{ app_puma_service_name }}.socket"
+app_socket_path: "{{ app_socket_root }}/{{ app_socket_file }}"
+app_puma_daemon_path: "{{ app_puma_home_path }}/.daemonrc"
+app_puma_chdir: "{{ app_puma_home_path }}/src"
+app_rbenv_activation_script_path: "{{ app_puma_home_path }}/.activate"
+
+# permissions over the socket file
+app_puma_socket_chmod: 770
+app_puma_socket_user: www-data
+app_puma_socket_group: www-data
+
+# number of parallel processes
+app_puma_n_worker: "1"
+app_puma_n_thread: "{{ ansible_processor_vcpus }}"
+
+# app will be executed as
+app_puma_exec_user: www-data
+app_puma_exec_group: www-data
+
+
+## nginx variables ############################################################
+
+# nginx extra config inside dynamic puma config
+app_nginx_extra_conf: ""
+
+# path where to get static files (assets and uploads)
+app_nginx_static_root: "{{ app_puma_chdir }}/public"
+
+# is ssl enabled
+app_nginx_ssl_enabled: false
+
+# is SSL only
+app_nginx_ssl_only: false
+
+# over SSL, serve all resources within the same TCP connection
+app_nginx_ssl_spdy_enabled: true
+
+# path of public ssl cert
+app_nginx_ssl_cert_path: ""
+
+# path of priv ssl key
+app_nginx_ssl_priv_path: ""
+
+# if the served assets must be cached by clients
+app_nginx_static_cache_assets_enabled: false
+
+# number of hours before expiration of static files uploaded to client
+app_nginx_static_cache_assets_expire_hours: 0
+
+# root paths of static assets 'must always be prefixed with '/'
+app_nginx_static_paths: []
+
+# if gzip compression must be enabled for static asset files
+app_nginx_gzip_enabled: true
+
+# gzip compression level of static assets files (from 1 to 9)
+app_nginx_gzip_compression_level: 6
+
+# if nginx requests per second limit must be enabled (outer static assets)
+app_nginx_limitreq_enabled: false
+
+# the maximum requests per second per client IP address to throw HTTP error
+app_nginx_limitreq_per_second: 10
+
+
+# dependencies in order to fully run rbenv
+app_puma_apt_dependencies:
+  - nginx
+  - ruby-build
+  - rbenv
+  - ruby-all-dev
+  - yard
+  - gcc
+  - g++
+  - libmagick++-dev
+  - cmake
+  - autoconf
+  - build-essential
+  - libssl-dev
+  - libffi-dev
+  - bison

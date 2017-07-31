@@ -1,0 +1,12 @@
+---
+- name: Ensure app Nginx config present
+  template:
+    src: templates/nginx.conf.j2
+    dest: "/etc/nginx/sites-enabled/{{ app_puma_service_name }}.conf"
+  notify: reload nginx
+
+- name: Ensure app SystemD service present
+  template:
+    src: templates/service.ini.j2
+    dest: "/etc/systemd/system/{{ app_puma_service_name }}.service"
+  register: service_file

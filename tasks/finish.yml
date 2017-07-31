@@ -1,0 +1,13 @@
+---
+- name: Ensure that the service is acknowledged by SystemD
+  command: "systemctl daemon-reload"
+  when: service_file.changed
+
+- name: Ensure that service will start at boot
+  command: "systemctl enable {{ app_puma_service_name }}"
+  when: service_file.changed
+
+- name: Ensure that service is running
+  service:
+    name: "{{ app_puma_service_name }}"
+    state: started

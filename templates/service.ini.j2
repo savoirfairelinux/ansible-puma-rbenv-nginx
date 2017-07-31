@@ -1,0 +1,15 @@
+[Unit]
+Description=Puma application server for {{ app_puma_service_name }}
+SourcePath={{ app_puma_daemon_path }}
+After=nginx.service
+
+[Service]
+Type=simple
+User={{ app_puma_exec_user }}
+ExecStart={{ app_puma_daemon_path }} start
+ExecStop={{ app_puma_daemon_path }} stop
+Restart=on-failure
+TimeoutStopSec=120
+
+[Install]
+WantedBy=default.target
