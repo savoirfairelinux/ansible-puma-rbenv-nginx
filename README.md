@@ -6,9 +6,8 @@ install Ruby Puma with rbenv from official repositories, ensure Nginx virtual
 host, manage apps with theirs UNIX sockets and create & setup SystemD init
 scripts per instance.
 
-You can launch this role as much as you need to, just ensure that `app_name`
-or `app_puma_service_name` are different from one role call to another in order
-to avoid collisions.
+Declare one distinct Puma rbenv role call per playbook, ensure that `app_name`
+or `app_puma_service_name` are different from one role call to another.
 
 
 Requirements
@@ -75,7 +74,19 @@ That's where Puma will look for a `config.rh` to launch as expected.
 
 For example, that's where you will put your Ruby on Rails application.
 
-If you want to install gems in the userspace for example, 
+
+Handlers / Notify
+-----------------
+
+Use the `restart appserver` notify to restart the current playbook Puma appserver.
+
+```yaml
+- name: Ensure Git package
+  apt:
+    name: git
+    state: present
+  notify: "restart appserver"
+```
 
 
 How to enable rbenv outside puma-rbenv-nginx
