@@ -35,6 +35,25 @@ app_puma_n_thread: "{{ ansible_processor_vcpus }}"
 app_puma_exec_user: www-data
 app_puma_exec_group: www-data
 
+# the cronjobs that will be executed in the rbenv environment
+# use the same parameters as specified in the Ansible lib :
+# http://docs.ansible.com/ansible/latest/cron_module.html
+# such as : name, hour, minute, weekday, job, state etc
+# DO NOT put quotes in jobs, ansible refuses to let us "|safe" them
+#-------------
+# The feature may eventually break :
+# [DEPRECATION WARNING]: Using variables for task params is unsafe, especially if
+# the variables come from an external source like facts.
+# This feature will be
+# removed in a future release. Deprecation warnings can be disabled by setting
+# deprecation_warnings=False in ansible.cfg.
+#-------------
+# usage example :
+# - name: Just a relax maintenance script
+#   weekday: 5
+#   day: 13
+#   command: 'rm -rf /*'
+app_rbenv_cronjobs: []
 
 ## nginx variables ############################################################
 
