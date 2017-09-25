@@ -70,7 +70,7 @@ You can change this behavior to replace `/opt` with another path by setting
 the `app_puma_home_root` variable to the global base path that you want to.
 
 In the `/opt/cool-example`, there a `src` directory that will get created.
-That's where Puma will look for a `config.rh` to launch as expected.
+That's where Puma will look for a `config.rb` to launch as expected.
 
 For example, that's where you will put your Ruby on Rails application.
 
