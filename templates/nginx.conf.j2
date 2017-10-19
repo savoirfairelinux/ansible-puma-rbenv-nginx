@@ -10,6 +10,36 @@ server {
 }
 {% endif -%}
 
+{% for redirector in app_nginx_redirect_names %}
+{% if redirector.ssl_enabled and redirector.ssl_only -%}
+server {
+    server_name {{ redirector.name }};
+    listen 80; listen [::]:80;
+    return {{ redirector.redirect_code }} https://{{ app_name }}$request_uri;
+}
+{% endif -%}
+
+server {
+    server_name {{ redirector.name }};
+
+    {% if not redirector.ssl_only %}
+    listen 80; listen [::]:80;
+    {% endif %}
+
+    {% if redirector.ssl_enabled -%}
+    listen 443 ssl {% if redirector.ssl_spdy_enabled %}http2{% endif %};
+    listen [::]:443 ssl {% if redirector.ssl_spdy_enabled %}http2{% endif %};
+
+    ssl_certificate {{ redirector.ssl_cert_path }};
+    ssl_certificate_key {{ redirector.ssl_priv_path }};
+
+    return {{ redirector.redirect_code }} https://{{ app_name }}$request_uri;
+    {% else %}
+    return {{ redirector.redirect_code }} http://{{ app_name }}$request_uri;
+    {% endif %}
+}
+{% endfor %}
+
 server {
     server_name {{ app_name }};
 
