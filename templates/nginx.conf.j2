@@ -11,18 +11,9 @@ server {
 {% endif -%}
 
 {% for redirector in app_nginx_redirect_names %}
-{% if redirector.ssl_enabled and redirector.ssl_only -%}
 server {
     server_name {{ redirector.name }};
-    listen 80; listen [::]:80;
-    return {{ redirector.redirect_code }} https://{{ app_name }}$request_uri;
-}
-{% endif -%}
-
-server {
-    server_name {{ redirector.name }};
-
-    {% if not redirector.ssl_only %}
+    {% if not redirector.ssl_only -%}
     listen 80; listen [::]:80;
     {% endif %}
 
@@ -32,11 +23,9 @@ server {
 
     ssl_certificate {{ redirector.ssl_cert_path }};
     ssl_certificate_key {{ redirector.ssl_priv_path }};
-
-    return {{ redirector.redirect_code }} https://{{ app_name }}$request_uri;
-    {% else %}
-    return {{ redirector.redirect_code }} http://{{ app_name }}$request_uri;
     {% endif %}
+
+    return {{ redirector.redirect_code }} http{% if app_nginx_ssl_enabled %}s{% endif %}://{{ app_name }}$request_uri;
 }
 {% endfor %}
 
