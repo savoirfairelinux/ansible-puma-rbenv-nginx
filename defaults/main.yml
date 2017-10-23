@@ -99,6 +99,17 @@ app_nginx_limitreq_enabled: false
 # the maximum requests per second per client IP address to throw HTTP error
 app_nginx_limitreq_per_second: 10
 
+# a list of domain names that nginx should handle and redirect to the main name
+app_nginx_redirect_names: []
+_app_nginx_redirect_names_item:
+  name: "_"
+  ssl_enabled: no
+  ssl_spdy_enabled: yes
+  ssl_cert_path: ""
+  ssl_priv_path: ""
+  ssl_only: no
+  redirect_code: 301
+
 
 # dependencies in order to fully run rbenv
 app_puma_apt_dependencies:
